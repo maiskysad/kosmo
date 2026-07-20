@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>МАЙСКИЙ САД</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --may-green: #4ade80;
+  --may-gold: #fbbf24;
+  --forest-dark: #0a1a0a;
+}
+
+body {
+  font-family: 'Cormorant Garamond', serif;
+  background: var(--forest-dark);
+  color: #fff;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* ===== VIDEO BACKGROUND ===== */
+.video-bg {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.video-bg video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(1.3) contrast(1.1);
+}
+
+.video-overlay {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: linear-gradient(
+    180deg,
+    rgba(10, 26, 10, 0.3) 0%,
+    rgba(0, 30, 20, 0.5) 50%,
+    rgba(10, 20, 10, 0.8) 100%
+  );
+  pointer-events: none;
+}
+
+/* ===== FLOATING PARTICLES ===== */
+.particles {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  width: 3px; height: 3px;
+  background: var(--may-green);
+  border-radius: 50%;
+  opacity: 0;
+  animation: float-up 10s ease-in-out infinite;
+  box-shadow: 0 0 8px var(--may-green);
+}
+
+.particle.gold {
+  background: var(--may-gold);
+  box-shadow: 0 0 8px var(--may-gold);
+}
+
+@keyframes float-up {
+  0% { transform: translateY(100vh) scale(0); opacity: 0; }
+  8% { opacity: 0.8; }
+  92% { opacity: 0.4; }
+  100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
+}
+
+/* ===== ENTRANCE TEXT ===== */
+.entrance {
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.6s ease;
+}
+
+.entrance:hover {
+  transform: translate(-50%, -50%) scale(1.05);
+}
+
+.entrance .line-latin {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem;
+  font-weight: 300;
+  font-style: italic;
+  letter-spacing: 0.25em;
+  color: rgba(255,255,255,0.5);
+  text-shadow: 0 0 30px rgba(74, 222, 128, 0.2);
+  transition: all 0.5s ease;
+}
+
+.entrance .line-cyrillic {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.6rem;
+  font-weight: 300;
+  letter-spacing: 0.15em;
+  color: rgba(255,255,255,0.85);
+  margin-top: 0.8rem;
+  text-shadow: 0 0 40px rgba(74, 222, 128, 0.3), 0 0 80px rgba(74, 222, 128, 0.1);
+  transition: all 0.5s ease;
+}
+
+.entrance:hover .line-latin {
+  color: rgba(255,255,255,0.7);
+  text-shadow: 0 0 40px rgba(74, 222, 128, 0.4);
+}
+
+.entrance:hover .line-cyrillic {
+  color: #fff;
+  text-shadow: 0 0 60px rgba(74, 222, 128, 0.5), 0 0 120px rgba(74, 222, 128, 0.2);
+}
+
+.entrance-glow {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 400px; height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(74, 222, 128, 0.08) 0%, transparent 70%);
+  animation: pulse-glow 6s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 9;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.4; }
+  50% { transform: translate(-50%, -50%) scale(1.3); opacity: 0.2; }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .entrance .line-latin { font-size: 1rem; letter-spacing: 0.2em; }
+  .entrance .line-cyrillic { font-size: 1.8rem; letter-spacing: 0.1em; }
+  .entrance-glow { width: 280px; height: 140px; }
+}
+</style>
+</head>
+<body>
+
+<!-- VIDEO BACKGROUND -->
+<div class="video-bg">
+  <video autoplay muted loop playsinline id="bgVideo">
+    <source src="video_2026-07-20_12-10-28.mp4" type="video/mp4">
+  </video>
+  <div class="video-overlay"></div>
+</div>
+
+<!-- FLOATING PARTICLES -->
+<div class="particles" id="particles"></div>
+
+<!-- ENTRANCE GLOW -->
+<div class="entrance-glow"></div>
+
+<!-- ENTRANCE TEXT -->
+<div class="entrance" onclick="enterGarden()">
+  <div class="line-latin">Enter Maisky Sad</div>
+  <div class="line-cyrillic">Войти в Майский сад</div>
+</div>
+
+<script>
+// ===== PARTICLE SYSTEM =====
+function createParticles() {
+  const container = document.getElementById('particles');
+  const classes = ['', 'gold'];
+
+  for (let i = 0; i < 30; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle ' + classes[Math.floor(Math.random() * classes.length)];
+    p.style.left = Math.random() * 100 + '%';
+    p.style.animationDelay = Math.random() * 10 + 's';
+    p.style.animationDuration = (7 + Math.random() * 8) + 's';
+    container.appendChild(p);
+  }
+}
+createParticles();
+
+// ===== ENTER GARDEN =====
+function enterGarden() {
+  // For now, show a toast. Later this will navigate to the main garden page.
+  const toast = document.createElement('div');
+  toast.style.cssText = `
+    position: fixed;
+    bottom: 3rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(5, 20, 10, 0.9);
+    border: 1px solid rgba(74, 222, 128, 0.2);
+    color: rgba(255,255,255,0.6);
+    padding: 1rem 2.5rem;
+    border-radius: 4px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem;
+    font-style: italic;
+    letter-spacing: 0.1em;
+    z-index: 200;
+    animation: fadeIn 0.6s ease, fadeOut 0.6s ease 2s forwards;
+    backdrop-filter: blur(10px);
+  `;
+  toast.textContent = 'The garden awaits... (main page coming next)';
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes fadeIn { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+  @keyframes fadeOut { from { opacity: 1; transform: translateX(-50%) translateY(0); } to { opacity: 0; transform: translateX(-50%) translateY(20px); } }
+`;
+document.head.appendChild(style);
+
+// ===== VIDEO ERROR HANDLING =====
+const video = document.getElementById('bgVideo');
+video.addEventListener('error', () => {
+  document.querySelector('.video-bg').style.background = 
+    'linear-gradient(135deg, #0a1a0a 0%, #1a3a2a 50%, #0a1a0a 100%)';
+});
+</script>
+
+</body>
+</html>
