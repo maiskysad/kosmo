@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>МАЙСКИЙ САД — Digital Garden of Kosmo</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Space+Mono:wght@400;700&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --cyan: #00e5ff;
+  --magenta: #ff0066;
+  --amber: #ffaa00;
+  --deep-teal: #004d4d;
+  --forest-dark: #0a1a0a;
+  --may-green: #4ade80;
+  --may-gold: #fbbf24;
+}
+
+body {
+  font-family: 'Cormorant Garamond', serif;
+  background: var(--forest-dark);
+  color: #fff;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* ===== VIDEO BACKGROUND ===== */
+.video-bg {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.video-bg video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(1.3) contrast(1.1);
+}
+
+.video-overlay {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: linear-gradient(
+    180deg,
+    rgba(10, 26, 10, 0.2) 0%,
+    rgba(0, 40, 30, 0.4) 40%,
+    rgba(10, 20, 10, 0.75) 100%
+  );
+  pointer-events: none;
+}
+
+/* ===== FLOATING PARTICLES (May petals) ===== */
+.particles {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  width: 4px; height: 4px;
+  background: var(--may-green);
+  border-radius: 50%;
+  opacity: 0;
+  animation: float-up 10s ease-in-out infinite;
+  box-shadow: 0 0 8px var(--may-green), 0 0 16px rgba(74, 222, 128, 0.4);
+}
+
+.particle.gold {
+  background: var(--may-gold);
+  box-shadow: 0 0 8px var(--may-gold), 0 0 16px rgba(251, 191, 36, 0.4);
+}
+
+.particle.cyan {
+  background: var(--cyan);
+  box-shadow: 0 0 8px var(--cyan), 0 0 16px rgba(0, 229, 255, 0.4);
+}
+
+@keyframes float-up {
+  0% { transform: translateY(100vh) scale(0) rotate(0deg); opacity: 0; }
+  8% { opacity: 0.9; }
+  92% { opacity: 0.5; }
+  100% { transform: translateY(-10vh) scale(1.8) rotate(360deg); opacity: 0; }
+}
+
+/* ===== UI LAYER ===== */
+.ui-layer {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 10;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 2rem;
+}
+
+.ui-layer > * { pointer-events: auto; }
+
+/* ===== HEADER ===== */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.logo {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  text-shadow: 0 0 20px rgba(74, 222, 128, 0.2);
+}
+
+.logo .cyrillic {
+  display: block;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.8rem;
+  font-weight: 300;
+  letter-spacing: 0.2em;
+  color: #fff;
+  margin-top: 0.2rem;
+  text-shadow: 0 0 40px rgba(74, 222, 128, 0.3), 0 0 80px rgba(74, 222, 128, 0.1);
+}
+
+.logo .latin {
+  display: block;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.9rem;
+  font-weight: 300;
+  font-style: italic;
+  letter-spacing: 0.15em;
+  color: rgba(255,255,255,0.4);
+  margin-top: 0.3rem;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.nav-links a {
+  color: rgba(255,255,255,0.45);
+  text-decoration: none;
+  transition: all 0.4s ease;
+  position: relative;
+}
+
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -4px; left: 0;
+  width: 0; height: 1px;
+  background: var(--may-green);
+  transition: width 0.4s ease;
+  box-shadow: 0 0 8px var(--may-green);
+}
+
+.nav-links a:hover {
+  color: var(--may-green);
+  text-shadow: 0 0 10px rgba(74, 222, 128, 0.4);
+}
+
+.nav-links a:hover::after {
+  width: 100%;
+}
+
+/* ===== CENTER TREE ===== */
+.center-stage {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.tree-container {
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.tree-container:hover {
+  transform: scale(1.08);
+}
+
+.tree-glow {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px; height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(74, 222, 128, 0.12) 0%, transparent 70%);
+  animation: pulse-glow 5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+  50% { transform: translate(-50%, -50%) scale(1.4); opacity: 0.25; }
+}
+
+.tree-image {
+  width: 220px;
+  height: 280px;
+  object-fit: cover;
+  border-radius: 4px;
+  filter: saturate(1.4) contrast(1.2);
+  box-shadow: 
+    0 0 40px rgba(74, 222, 128, 0.15),
+    0 0 80px rgba(74, 222, 128, 0.08),
+    0 20px 60px rgba(0,0,0,0.5);
+  transition: all 0.6s ease;
+}
+
+.tree-container:hover .tree-image {
+  box-shadow: 
+    0 0 60px rgba(74, 222, 128, 0.3),
+    0 0 120px rgba(74, 222, 128, 0.1),
+    0 30px 80px rgba(0,0,0,0.6);
+}
+
+.tree-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+  text-align: center;
+  transition: all 0.4s ease;
+}
+
+.tree-container:hover .tree-label {
+  color: var(--may-green);
+  text-shadow: 0 0 15px rgba(74, 222, 128, 0.4);
+}
+
+.tree-label .project-name {
+  display: block;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem;
+  font-weight: 300;
+  font-style: italic;
+  letter-spacing: 0.1em;
+  margin-top: 0.5rem;
+  color: rgba(255,255,255,0.85);
+}
+
+/* ===== FOOTER ===== */
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.scroll-hint {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.25em;
+  color: rgba(255,255,255,0.25);
+  animation: fade-pulse 4s ease-in-out infinite;
+}
+
+@keyframes fade-pulse {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 0.6; }
+}
+
+.social-links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.social-links a {
+  color: rgba(255,255,255,0.35);
+  text-decoration: none;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.15em;
+  transition: all 0.3s ease;
+}
+
+.social-links a:hover {
+  color: var(--may-green);
+  text-shadow: 0 0 10px rgba(74, 222, 128, 0.3);
+}
+
+/* ===== PROJECT MODAL ===== */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(5, 15, 10, 0.94);
+  backdrop-filter: blur(25px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-content {
+  width: 90%;
+  max-width: 900px;
+  max-height: 85vh;
+  overflow-y: auto;
+  position: relative;
+  transform: translateY(30px) scale(0.95);
+  transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.modal-overlay.active .modal-content {
+  transform: translateY(0) scale(1);
+}
+
+.modal-close {
+  position: fixed;
+  top: 2rem; right: 2rem;
+  width: 44px; height: 44px;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 50%;
+  background: rgba(0,0,0,0.3);
+  color: rgba(255,255,255,0.5);
+  font-size: 1.3rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 101;
+}
+
+.modal-close:hover {
+  border-color: var(--may-green);
+  color: var(--may-green);
+  box-shadow: 0 0 20px rgba(74, 222, 128, 0.2);
+}
+
+.project-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  padding: 2rem;
+}
+
+.project-visual {
+  position: relative;
+}
+
+.project-visual img {
+  width: 100%;
+  border-radius: 4px;
+  filter: saturate(1.3) contrast(1.15);
+  box-shadow: 0 0 40px rgba(74, 222, 128, 0.08);
+}
+
+.project-visual::after {
+  content: '';
+  position: absolute;
+  top: -10px; left: -10px;
+  right: -10px; bottom: -10px;
+  border: 1px solid rgba(74, 222, 128, 0.08);
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+.project-info h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.4rem;
+  font-weight: 300;
+  font-style: italic;
+  margin-bottom: 0.5rem;
+  color: #fff;
+}
+
+.project-info .project-meta {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--may-green);
+  margin-bottom: 2rem;
+  opacity: 0.6;
+}
+
+.project-info p {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: rgba(255,255,255,0.55);
+  font-weight: 300;
+  margin-bottom: 1.5rem;
+}
+
+.project-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.btn {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 0.9rem 2rem;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: transparent;
+  color: rgba(255,255,255,0.6);
+  cursor: pointer;
+  transition: all 0.4s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn:hover {
+  border-color: var(--may-green);
+  color: var(--may-green);
+  box-shadow: 0 0 20px rgba(74, 222, 128, 0.1);
+}
+
+.btn-primary {
+  background: rgba(74, 222, 128, 0.06);
+  border-color: rgba(74, 222, 128, 0.25);
+}
+
+.btn-primary:hover {
+  background: rgba(74, 222, 128, 0.12);
+}
+
+/* ===== TELEGRAM WIDGET AREA ===== */
+.telegram-area {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 20;
+}
+
+.telegram-trigger {
+  width: 50px; height: 50px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(74, 222, 128, 0.2);
+  color: var(--may-green);
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.4s ease;
+  backdrop-filter: blur(10px);
+}
+
+.telegram-trigger:hover {
+  background: rgba(74, 222, 128, 0.1);
+  border-color: var(--may-green);
+  box-shadow: 0 0 30px rgba(74, 222, 128, 0.2);
+  transform: scale(1.1);
+}
+
+.telegram-panel {
+  position: absolute;
+  bottom: 60px;
+  right: 0;
+  width: 380px;
+  height: 500px;
+  background: rgba(5, 15, 10, 0.96);
+  border: 1px solid rgba(74, 222, 128, 0.12);
+  border-radius: 12px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  backdrop-filter: blur(20px);
+}
+
+.telegram-panel.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.telegram-panel iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.telegram-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+.telegram-placeholder p {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  color: rgba(255,255,255,0.35);
+  line-height: 1.8;
+}
+
+.telegram-placeholder a {
+  color: var(--may-green);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(74, 222, 128, 0.3);
+  padding-bottom: 2px;
+  transition: all 0.3s ease;
+}
+
+.telegram-placeholder a:hover {
+  border-bottom-color: var(--may-green);
+  text-shadow: 0 0 10px rgba(74, 222, 128, 0.3);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .project-card {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding: 1.5rem;
+  }
+
+  .tree-image {
+    width: 160px;
+    height: 200px;
+  }
+
+  .tree-glow {
+    width: 220px; height: 220px;
+  }
+
+  .telegram-panel {
+    width: calc(100vw - 4rem);
+    right: -1rem;
+  }
+
+  .logo .cyrillic { font-size: 2rem; }
+  .logo .latin { font-size: 0.75rem; }
+  .nav-links { gap: 1rem; }
+}
+
+/* ===== CUSTOM SCROLLBAR ===== */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(74, 222, 128, 0.15); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(74, 222, 128, 0.35); }
+</style>
+</head>
+<body>
+
+<!-- VIDEO BACKGROUND -->
+<div class="video-bg">
+  <video autoplay muted loop playsinline id="bgVideo">
+    <source src="video_2026-07-20_12-10-28.mp4" type="video/mp4">
+  </video>
+  <div class="video-overlay"></div>
+</div>
+
+<!-- FLOATING PARTICLES -->
+<div class="particles" id="particles"></div>
+
+<!-- UI LAYER -->
+<div class="ui-layer">
+  <!-- HEADER -->
+  <header class="header">
+    <div class="logo">
+      Digital Garden
+      <span class="cyrillic">МАЙСКИЙ САД</span>
+      <span class="latin">May Garden — by Kosmo</span>
+    </div>
+    <nav class="nav-links">
+      <a href="#" onclick="showToast('Gallery coming soon')">Gallery</a>
+      <a href="#" onclick="showToast('Shop coming soon')">Shop</a>
+      <a href="#" onclick="showToast('About coming soon')">About</a>
+    </nav>
+  </header>
+
+  <!-- CENTER TREE -->
+  <div class="center-stage">
+    <div class="tree-container" onclick="openModal()">
+      <div class="tree-glow"></div>
+      <img src="IMG_4019.jpg" alt="Project Tree" class="tree-image" id="treeImg">
+      <div class="tree-label">
+        Explore Project
+        <span class="project-name">Crimson Canopy</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="scroll-hint">Wander deeper into the garden ↓</div>
+    <div class="social-links">
+      <a href="https://instagram.com/16kosmo" target="_blank">Instagram</a>
+      <a href="#" onclick="showToast('SoundCloud coming soon')">SoundCloud</a>
+    </div>
+  </footer>
+</div>
+
+<!-- PROJECT MODAL -->
+<div class="modal-overlay" id="projectModal">
+  <button class="modal-close" onclick="closeModal()">×</button>
+  <div class="modal-content">
+    <div class="project-card">
+      <div class="project-visual">
+        <img src="IMG_4019.jpg" alt="Crimson Canopy">
+      </div>
+      <div class="project-info">
+        <h2>Crimson Canopy</h2>
+        <div class="project-meta">Photography / Digital Manipulation / 2026</div>
+        <p>
+          A dreamscape where the forest breathes in colors that don't exist in nature. 
+          The trees stand as silent witnesses to a world where autumn never ends and 
+          the light carries whispers from another dimension.
+        </p>
+        <p>
+          Shot on a summer afternoon, transformed through generative color grading 
+          to reveal the hidden emotional frequencies of the woodland.
+        </p>
+        <div class="project-actions">
+          <a href="#" class="btn btn-primary" onclick="showToast('Print shop coming soon')">Buy Print</a>
+          <a href="#" class="btn" onclick="showToast('Full gallery coming soon')">View Series</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TELEGRAM WIDGET -->
+<div class="telegram-area">
+  <div class="telegram-panel" id="telegramPanel">
+    <div class="telegram-placeholder">
+      <p>
+        🌿<br><br>
+        Your Telegram group will appear here.<br>
+        Replace this with your embed code once<br>
+        you create your group.
+      </p>
+      <p>
+        <a href="https://t.me/" target="_blank">Create your group →</a>
+      </p>
+    </div>
+  </div>
+  <button class="telegram-trigger" onclick="toggleTelegram()" title="Community Chat">
+    💬
+  </button>
+</div>
+
+<script>
+// ===== PARTICLE SYSTEM (May petals) =====
+function createParticles() {
+  const container = document.getElementById('particles');
+  const classes = ['', 'gold', 'cyan'];
+
+  for (let i = 0; i < 35; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle ' + classes[Math.floor(Math.random() * classes.length)];
+    p.style.left = Math.random() * 100 + '%';
+    p.style.animationDelay = Math.random() * 10 + 's';
+    p.style.animationDuration = (7 + Math.random() * 8) + 's';
+    p.style.width = (2 + Math.random() * 4) + 'px';
+    p.style.height = p.style.width;
+    container.appendChild(p);
+  }
+}
+createParticles();
+
+// ===== MODAL =====
+function openModal() {
+  document.getElementById('projectModal').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('projectModal').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeModal();
+});
+
+document.getElementById('projectModal').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) closeModal();
+});
+
+// ===== TELEGRAM TOGGLE =====
+function toggleTelegram() {
+  document.getElementById('telegramPanel').classList.toggle('active');
+}
+
+document.addEventListener('click', (e) => {
+  const panel = document.getElementById('telegramPanel');
+  const trigger = document.querySelector('.telegram-trigger');
+  if (!panel.contains(e.target) && !trigger.contains(e.target)) {
+    panel.classList.remove('active');
+  }
+});
+
+// ===== TOAST NOTIFICATION =====
+function showToast(message) {
+  const toast = document.createElement('div');
+  toast.style.cssText = `
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(5, 20, 10, 0.92);
+    border: 1px solid rgba(74, 222, 128, 0.15);
+    color: rgba(255,255,255,0.65);
+    padding: 0.8rem 2rem;
+    border-radius: 4px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    z-index: 200;
+    animation: toastIn 0.4s ease, toastOut 0.4s ease 2.5s forwards;
+    backdrop-filter: blur(10px);
+  `;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+
+  setTimeout(() => toast.remove(), 3000);
+}
+
+const toastStyle = document.createElement('style');
+toastStyle.textContent = `
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+  @keyframes toastOut {
+    from { opacity: 1; transform: translateX(-50%) translateY(0); }
+    to { opacity: 0; transform: translateX(-50%) translateY(20px); }
+  }
+`;
+document.head.appendChild(toastStyle);
+
+// ===== PARALLAX ON MOUSE MOVE =====
+document.addEventListener('mousemove', (e) => {
+  const x = (e.clientX / window.innerWidth - 0.5) * 20;
+  const y = (e.clientY / window.innerHeight - 0.5) * 20;
+
+  const tree = document.querySelector('.tree-container');
+  if (tree) {
+    tree.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+  }
+});
+
+// ===== VIDEO ERROR HANDLING =====
+const video = document.getElementById('bgVideo');
+video.addEventListener('error', () => {
+  document.querySelector('.video-bg').style.background = 
+    'linear-gradient(135deg, #0a1a0a 0%, #1a3a2a 50%, #0a1a0a 100%)';
+});
+</script>
+
+</body>
+</html>
